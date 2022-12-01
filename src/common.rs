@@ -17,6 +17,14 @@ where
         .collect();
 }
 
+pub fn parsed<T>(lines: &Vec<String>) -> Vec<T>
+where
+    T: FromStr,
+    <T as FromStr>::Err: Debug,
+{
+    return lines.iter().map(|s| s.parse::<T>().unwrap()).collect();
+}
+
 pub fn read_strings(filename: &str) -> Vec<String> {
     return read_lines(filename)
         .unwrap()

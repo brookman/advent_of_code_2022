@@ -12,10 +12,7 @@ fn main() {
     solve(Dec02 {}, "02");
 }
 
-fn solve<T>(solution: T, prefix: &str)
-where
-    T: Solution,
-{
+fn solve<T: Solution>(solution: T, prefix: &str) {
     println!("\nDecember {}, 2022", prefix);
     println!("--- Part One ---");
     let lines1 = read_strings(&format!("data/in_{}_1.txt", prefix));
