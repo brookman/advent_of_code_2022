@@ -1,45 +1,28 @@
+#![allow(dead_code)]
+use std::fmt::Debug;
 use std::io::{BufRead, BufReader, Lines, Result};
+use std::str::FromStr;
 use std::{fs::File, path::Path};
 
-pub fn read_numbers(filename: &str) -> Vec<i32> {
-    let mut numbers = Vec::new();
-    if let Ok(lines) = read_lines(filename) {
-        // Consumes the iterator, returns an (Optional) String
-        for line in lines {
-            if let Ok(l) = line {
-                let number = l.parse::<i32>().unwrap();
-                numbers.push(number);
-            }
-        }
-    }
-    return numbers;
-}
-
-pub fn read_larger_numbers(filename: &str) -> Vec<i64> {
-    let mut numbers = Vec::new();
-    if let Ok(lines) = read_lines(filename) {
-        // Consumes the iterator, returns an (Optional) String
-        for line in lines {
-            if let Ok(l) = line {
-                let number = l.parse::<i64>().unwrap();
-                numbers.push(number);
-            }
-        }
-    }
-    return numbers;
+pub fn read_parsed<T>(filename: &str) -> Vec<T>
+where
+    T: FromStr,
+    <T as FromStr>::Err: Debug,
+{
+    return read_lines(filename)
+        .unwrap()
+        .into_iter()
+        .filter_map(|r| r.ok())
+        .map(|s| s.parse::<T>().unwrap())
+        .collect();
 }
 
 pub fn read_strings(filename: &str) -> Vec<String> {
-    let mut strings = Vec::new();
-    if let Ok(lines) = read_lines(filename) {
-        // Consumes the iterator, returns an (Optional) String
-        for line in lines {
-            if let Ok(l) = line {
-                strings.push(l);
-            }
-        }
-    }
-    return strings;
+    return read_lines(filename)
+        .unwrap()
+        .into_iter()
+        .filter_map(|r| r.ok())
+        .collect();
 }
 
 // The output is wrapped in a Result to allow matching on errors
@@ -50,4 +33,9 @@ where
 {
     let file = File::open(filename)?;
     Ok(BufReader::new(file).lines())
+}
+
+pub trait Solution {
+    fn solve_one(&self, lines: &Vec<String>) -> String;
+    fn solve_two(&self, lines: &Vec<String>) -> String;
 }
