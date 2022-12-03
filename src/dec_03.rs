@@ -6,39 +6,41 @@ pub struct Dec03 {}
 
 impl Solution for Dec03 {
     fn solve_one(&self, lines: &Vec<String>) -> String {
-        let mut sum = 0u32;
-        for line in lines {
-            let chars: Vec<char> = line.chars().collect();
-            let half = chars.len() / 2;
-
-            let first_half: HashSet<char> = HashSet::from_iter(chars[..half].iter().cloned());
-            let second_half: HashSet<char> = HashSet::from_iter(chars[half..].iter().cloned());
-
-            let in_both = first_half.intersection(&second_half).next().unwrap();
-            sum += to_priority(in_both);
-        }
-
-        sum.to_string()
+        lines
+            .iter()
+            .map(|line| {
+                let first_half = line[..(line.len() / 2)].to_string();
+                let second_half = line[(line.len() / 2)..].to_string();
+                calc_priority_of_single_intersection(&[first_half, second_half])
+            })
+            .sum::<u32>()
+            .to_string()
     }
 
     fn solve_two(&self, lines: &Vec<String>) -> String {
-        let mut sum = 0u32;
-        for chunk in lines.chunks(3) {
-            let sets: Vec<HashSet<char>> = chunk
-                .iter()
-                .map(|line| line.chars())
-                .map(|chars| HashSet::from_iter(chars))
-                .collect();
-
-            let intersection = sets.iter().skip(1).fold(sets[0].clone(), |acc, hs| {
-                acc.intersection(hs).cloned().collect()
-            });
-
-            sum += to_priority(intersection.iter().next().unwrap());
-        }
-
-        sum.to_string()
+        lines
+            .chunks(3)
+            .map(|chunk| calc_priority_of_single_intersection(chunk))
+            .sum::<u32>()
+            .to_string()
     }
+}
+
+fn calc_priority_of_single_intersection(lines: &[String]) -> u32 {
+    let single_char = calc_intersection(lines).into_iter().next().unwrap();
+    to_priority(&single_char)
+}
+
+fn calc_intersection(lines: &[String]) -> HashSet<char> {
+    let sets: Vec<HashSet<char>> = lines
+        .iter()
+        .map(|line| line.chars())
+        .map(|chars| HashSet::from_iter(chars))
+        .collect();
+
+    sets.iter().skip(1).fold(sets[0].clone(), |acc, hs| {
+        acc.intersection(hs).cloned().collect()
+    })
 }
 
 fn to_priority(c: &char) -> u32 {
