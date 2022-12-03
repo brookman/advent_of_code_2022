@@ -4,16 +4,19 @@ use common::Solution;
 use dec_01::Dec01;
 use dec_02::Dec02;
 use dec_03::Dec03;
+use dec_04::Dec04;
 
 mod common;
 mod dec_01;
 mod dec_02;
 mod dec_03;
+mod dec_04;
 
 fn main() {
     solve(Dec01 {}, "01");
     solve(Dec02 {}, "02");
     solve(Dec03 {}, "03");
+    solve(Dec04 {}, "04");
 }
 
 fn solve<T: Solution>(solution: T, prefix: &str) {
