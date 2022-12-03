@@ -16,9 +16,8 @@ impl Solution for Dec04 {
 
 #[cfg(test)]
 mod tests {
-    use crate::{solve_one, solve_two};
-
     use super::Dec04;
+    use crate::{solve_one, solve_two};
 
     #[test]
     fn solution_one() {

@@ -39,9 +39,8 @@ fn to_priority(c: &char) -> u16 {
 
 #[cfg(test)]
 mod tests {
-    use crate::{solve_one, solve_two};
-
     use super::Dec03;
+    use crate::{solve_one, solve_two};
 
     #[test]
     fn solution_one() {
