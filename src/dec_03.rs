@@ -7,8 +7,8 @@ impl Solution for Dec03 {
         lines
             .iter()
             .map(|line| {
-                let half = line.len() >> 1;
-                (to_bitmask(&line[..half]) & to_bitmask(&line[half..])).trailing_zeros()
+                let (first_half, second_half) = line.split_at(line.len() / 2);
+                (to_bitmask(first_half) & to_bitmask(second_half)).trailing_zeros()
             })
             .sum::<u32>()
             .to_string()
