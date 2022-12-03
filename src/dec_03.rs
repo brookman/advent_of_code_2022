@@ -74,6 +74,7 @@ CrZsJsPPZsGzwwsLwLmpwMDw";
 
         assert_eq!(result, "157");
     }
+
     #[test]
     fn solution_two() {
         let input = "vJrwpWtwJgWrhcsFMMfFFhFp
