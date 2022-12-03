@@ -44,6 +44,6 @@ where
 }
 
 pub trait Solution {
-    fn solve_one(&self, lines: &Vec<String>) -> String;
-    fn solve_two(&self, lines: &Vec<String>) -> String;
+    fn solve_one(&self, input: &Vec<&str>) -> String;
+    fn solve_two(&self, lines: &Vec<&str>) -> String;
 }

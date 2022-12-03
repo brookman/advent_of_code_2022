@@ -3,7 +3,7 @@ use crate::common::Solution;
 pub struct Dec03 {}
 
 impl Solution for Dec03 {
-    fn solve_one(&self, lines: &Vec<String>) -> String {
+    fn solve_one(&self, lines: &Vec<&str>) -> String {
         lines
             .iter()
             .map(|line| {
@@ -14,7 +14,7 @@ impl Solution for Dec03 {
             .to_string()
     }
 
-    fn solve_two(&self, lines: &Vec<String>) -> String {
+    fn solve_two(&self, lines: &Vec<&str>) -> String {
         lines
             .chunks(3)
             .map(|chunks| {
@@ -39,7 +39,7 @@ fn to_priority(c: &char) -> u16 {
 
 #[cfg(test)]
 mod tests {
-    use crate::common::Solution;
+    use crate::{solve_one, solve_two};
 
     use super::Dec03;
 
@@ -51,13 +51,7 @@ PmmdzqPrVvPwwTWBwg
 wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
 ttgJtRGJQctTZtZT
 CrZsJsPPZsGzwwsLwLmpwMDw";
-        let lines: Vec<String> = input
-            .lines()
-            .map(|s| s.to_string())
-            .collect::<Vec<String>>();
-        let result = Dec03 {}.solve_one(&lines);
-
-        assert_eq!(result, "157");
+        assert_eq!(solve_one(&Dec03 {}, input), "157");
     }
 
     #[test]
@@ -68,12 +62,6 @@ PmmdzqPrVvPwwTWBwg
 wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
 ttgJtRGJQctTZtZT
 CrZsJsPPZsGzwwsLwLmpwMDw";
-        let lines: Vec<String> = input
-            .lines()
-            .map(|s| s.to_string())
-            .collect::<Vec<String>>();
-        let result = Dec03 {}.solve_two(&lines);
-
-        assert_eq!(result, "70");
+        assert_eq!(solve_two(&Dec03 {}, input), "70");
     }
 }
