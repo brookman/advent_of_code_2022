@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use crate::common::Solution;
 
 pub struct Dec03 {}
@@ -9,9 +7,8 @@ impl Solution for Dec03 {
         lines
             .iter()
             .map(|line| {
-                let first_half = line[..(line.len() / 2)].to_string();
-                let second_half = line[(line.len() / 2)..].to_string();
-                calc_priority_of_single_intersection(&[first_half, second_half])
+                let half = line.len() >> 1;
+                (to_bitmask(&line[..half]) & to_bitmask(&line[half..])).trailing_zeros()
             })
             .sum::<u32>()
             .to_string()
@@ -20,36 +17,24 @@ impl Solution for Dec03 {
     fn solve_two(&self, lines: &Vec<String>) -> String {
         lines
             .chunks(3)
-            .map(|chunk| calc_priority_of_single_intersection(chunk))
+            .map(|chunks| {
+                (to_bitmask(&chunks[0]) & to_bitmask(&chunks[1]) & to_bitmask(&chunks[2]))
+                    .trailing_zeros()
+            })
             .sum::<u32>()
             .to_string()
     }
 }
 
-fn calc_priority_of_single_intersection(lines: &[String]) -> u32 {
-    let single_char = calc_intersection(lines).into_iter().next().unwrap();
-    to_priority(&single_char)
+fn to_bitmask(line: &str) -> u64 {
+    line.chars()
+        .map(|c| 1u64 << to_priority(&c))
+        .fold(0u64, |acc, v| acc | v)
 }
 
-fn calc_intersection(lines: &[String]) -> HashSet<char> {
-    let sets: Vec<HashSet<char>> = lines
-        .iter()
-        .map(|line| line.chars())
-        .map(|chars| HashSet::from_iter(chars))
-        .collect();
-
-    sets.iter().skip(1).fold(sets[0].clone(), |acc, hs| {
-        acc.intersection(hs).cloned().collect()
-    })
-}
-
-fn to_priority(c: &char) -> u32 {
-    let ascii = c.clone() as u32;
-    if ascii > 97 {
-        return ascii - 96;
-    } else {
-        return ascii - 38;
-    }
+fn to_priority(c: &char) -> u16 {
+    let ascii = c.clone() as u16;
+    ascii - if ascii > 97 { 96 } else { 38 }
 }
 
 #[cfg(test)]
