@@ -28,7 +28,7 @@ impl Solution for Dec04 {
     }
 }
 
-pub fn parse<T: AsRef<str>>(line: T) -> (Interval<u32>, Interval<u32>) {
+fn parse<T: AsRef<str>>(line: T) -> (Interval<u32>, Interval<u32>) {
     let parts: Vec<u32> = line
         .as_ref()
         .split(&['-', ','])
