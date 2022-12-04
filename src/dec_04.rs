@@ -13,8 +13,8 @@ impl Solution for Dec04 {
         lines
             .iter()
             .map(|line| parse(line))
-            .map(|(a, b)| (a.is_subset(&b) || b.is_subset(&a)) as u32)
-            .sum::<u32>()
+            .filter(|(a, b)| (a.is_subset(&b) || b.is_subset(&a)))
+            .count()
             .to_string()
     }
 
@@ -22,8 +22,8 @@ impl Solution for Dec04 {
         lines
             .iter()
             .map(|line| parse(line))
-            .map(|(a, b)| a.overlap(&b) as u32)
-            .sum::<u32>()
+            .filter(|(a, b)| a.overlap(b))
+            .count()
             .to_string()
     }
 }
