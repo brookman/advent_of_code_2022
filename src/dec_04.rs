@@ -12,7 +12,7 @@ impl Solution for Dec04 {
     fn solve_one(&self, lines: &Vec<&str>) -> String {
         lines
             .iter()
-            .map(|line| parse(line))
+            .map(parse)
             .filter(|(a, b)| (a.is_subset(&b) || b.is_subset(&a)))
             .count()
             .to_string()
@@ -21,18 +21,19 @@ impl Solution for Dec04 {
     fn solve_two(&self, lines: &Vec<&str>) -> String {
         lines
             .iter()
-            .map(|line| parse(line))
+            .map(parse)
             .filter(|(a, b)| a.overlap(b))
             .count()
             .to_string()
     }
 }
 
-fn parse(line: &str) -> (Interval<u32>, Interval<u32>) {
-    let parts = line
-        .split(&[',', '-'])
+pub fn parse<T: AsRef<str>>(line: T) -> (Interval<u32>, Interval<u32>) {
+    let parts: Vec<u32> = line
+        .as_ref()
+        .split(&['-', ','])
         .map(|s| s.parse::<u32>().unwrap())
-        .collect::<Vec<u32>>();
+        .collect();
     (
         Interval::new(parts[0], parts[1]),
         Interval::new(parts[2], parts[3]),
