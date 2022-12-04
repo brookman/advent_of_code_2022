@@ -1,50 +1,42 @@
+extern crate gcollections;
+extern crate interval;
+
+use gcollections::ops::{Overlap, Subset};
+use interval::{ops::Range, Interval};
+
 use crate::common::Solution;
 
 pub struct Dec04 {}
 
 impl Solution for Dec04 {
     fn solve_one(&self, lines: &Vec<&str>) -> String {
-        let mut count = 0u32;
-        for line in lines {
-            let parts = line.split(",").collect::<Vec<&str>>();
-            let first  = parts[0].split("-").collect::<Vec<&str>>();
-            let second = parts[1].split("-").collect::<Vec<&str>>();
-
-            let first_from = first[0].parse::<u32>().unwrap();
-            let first_to = first[1].parse::<u32>().unwrap();
-
-            let second_from = second[0].parse::<u32>().unwrap();
-            let second_to = second[1].parse::<u32>().unwrap();
-
-            if (first_from <= second_from && first_to >= second_to) || (second_from<=first_from   && second_to >=first_to ){
-                count += 1;
-            }
-
-        }
-        count.to_string()
+        lines
+            .iter()
+            .map(|line| parse(line))
+            .map(|(a, b)| (a.is_subset(&b) || b.is_subset(&a)) as u32)
+            .sum::<u32>()
+            .to_string()
     }
 
     fn solve_two(&self, lines: &Vec<&str>) -> String {
-        let mut count = 0u32;
-        for line in lines {
-            let parts = line.split(",").collect::<Vec<&str>>();
-            let first  = parts[0].split("-").collect::<Vec<&str>>();
-            let second = parts[1].split("-").collect::<Vec<&str>>();
-
-            let first_from = first[0].parse::<u32>().unwrap();
-            let first_to = first[1].parse::<u32>().unwrap();
-
-            let second_from = second[0].parse::<u32>().unwrap();
-            let second_to = second[1].parse::<u32>().unwrap();
-
-            if (first_from >= second_from && first_from <= second_to) || (first_to >= second_from && first_to <= second_to) ||
-            (second_from >= first_from && second_from <= first_to) || (second_to >= first_from && second_to <= first_to){
-                count += 1;
-            }
-
-        }
-        count.to_string()
+        lines
+            .iter()
+            .map(|line| parse(line))
+            .map(|(a, b)| a.overlap(&b) as u32)
+            .sum::<u32>()
+            .to_string()
     }
+}
+
+fn parse(line: &str) -> (Interval<u32>, Interval<u32>) {
+    let parts = line
+        .split(&[',', '-'])
+        .map(|s| s.parse::<u32>().unwrap())
+        .collect::<Vec<u32>>();
+    (
+        Interval::new(parts[0], parts[1]),
+        Interval::new(parts[2], parts[3]),
+    )
 }
 
 #[cfg(test)]
@@ -54,7 +46,7 @@ mod tests {
 
     #[test]
     fn solution_one() {
-    let input = "2-4,6-8
+        let input = "2-4,6-8
 2-3,4-5
 5-7,7-9
 2-8,3-7
