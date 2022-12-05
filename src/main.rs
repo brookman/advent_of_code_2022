@@ -13,6 +13,7 @@ mod dec_02;
 mod dec_03;
 mod dec_04;
 mod dec_05;
+mod dec_05_parsing;
 
 fn main() {
     solve(Dec01 {}, "01");
