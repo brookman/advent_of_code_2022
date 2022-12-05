@@ -17,7 +17,7 @@ enum Outcome {
 }
 
 impl Solution for Dec02 {
-    fn solve_one(&self, lines: &Vec<&str>) -> String {
+    fn solve_one(&self, _: &str, lines: &Vec<&str>) -> String {
         let mut score = 0u32;
         for line in lines {
             let columns = line.split(" ").collect::<Vec<&str>>();
@@ -45,7 +45,7 @@ impl Solution for Dec02 {
         score.to_string()
     }
 
-    fn solve_two(&self, lines: &Vec<&str>) -> String {
+    fn solve_two(&self, _: &str, lines: &Vec<&str>) -> String {
         let mut score = 0u32;
         for line in lines {
             let columns = line.split(" ").collect::<Vec<&str>>();
@@ -65,7 +65,7 @@ impl Solution for Dec02 {
             };
 
             let me = calc_choice(&enemy, &outcome);
-            
+
             score += me as u32;
             score += outcome as u32;
         }

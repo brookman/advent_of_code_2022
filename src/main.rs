@@ -36,7 +36,7 @@ fn solve<T: Solution>(solution: T, prefix: &str) {
 pub fn solve_one<T: Solution>(solution: &T, input: &str) -> String {
     let lines: Vec<&str> = input.lines().collect();
     let start = Instant::now();
-    let solution = solution.solve_one(&lines);
+    let solution = solution.solve_one(input, &lines);
     let elapsed = start.elapsed();
     println!("{}     in {:?}", solution, elapsed);
     solution
@@ -45,7 +45,7 @@ pub fn solve_one<T: Solution>(solution: &T, input: &str) -> String {
 pub fn solve_two<T: Solution>(solution: &T, input: &str) -> String {
     let lines: Vec<&str> = input.lines().collect();
     let start = Instant::now();
-    let solution = solution.solve_two(&lines);
+    let solution = solution.solve_two(input, &lines);
     let elapsed = start.elapsed();
     println!("{}     in {:?}", solution, elapsed);
     solution

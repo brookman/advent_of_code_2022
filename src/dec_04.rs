@@ -9,7 +9,7 @@ use crate::common::Solution;
 pub struct Dec04 {}
 
 impl Solution for Dec04 {
-    fn solve_one(&self, lines: &Vec<&str>) -> String {
+    fn solve_one(&self, _: &str, lines: &Vec<&str>) -> String {
         lines
             .iter()
             .map(parse)
@@ -18,7 +18,7 @@ impl Solution for Dec04 {
             .to_string()
     }
 
-    fn solve_two(&self, lines: &Vec<&str>) -> String {
+    fn solve_two(&self, _: &str, lines: &Vec<&str>) -> String {
         lines
             .iter()
             .map(parse)

@@ -5,11 +5,11 @@ use crate::common::Solution;
 pub struct Dec01 {}
 
 impl Solution for Dec01 {
-    fn solve_one(&self, lines: &Vec<&str>) -> String {
+    fn solve_one(&self, _: &str, lines: &Vec<&str>) -> String {
         get_sum_of_blocks(lines).iter().max().unwrap().to_string()
     }
 
-    fn solve_two(&self, lines: &Vec<&str>) -> String {
+    fn solve_two(&self, _: &str, lines: &Vec<&str>) -> String {
         get_sum_of_blocks(lines)
             .into_iter()
             .sorted_by(|a, b| b.cmp(a))
