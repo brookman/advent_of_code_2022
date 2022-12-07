@@ -16,20 +16,20 @@ fn find_first_unique_slice(input: &str, n: usize) -> Option<usize> {
     let chars: Vec<u8> = input.chars().map(|c| c as u8 - 'a' as u8).collect();
 
     for i in 0..(input.len() - n) {
-        if all_different(&chars[i..i + n], n) {
+        if all_different(&chars[i..i + n]) {
             return Some(i + n);
         }
     }
     None
 }
 
-fn all_different(slice: &[u8], n: usize) -> bool {
+fn all_different(slice: &[u8]) -> bool {
     slice
         .iter()
         .map(|c| 1 << c)
         .fold(0u32, |acc, v| acc | v)
         .count_ones()
-        == n as u32
+        == slice.len() as u32
 }
 
 #[cfg(test)]

@@ -7,6 +7,7 @@ use dec_03::Dec03;
 use dec_04::Dec04;
 use dec_05::Dec05;
 use dec_06::Dec06;
+use dec_07::Dec07;
 
 mod common;
 mod dec_01;
@@ -16,6 +17,7 @@ mod dec_04;
 mod dec_05;
 mod dec_05_parsing;
 mod dec_06;
+mod dec_07;
 
 fn main() {
     solve(Dec01 {}, "01");
@@ -24,6 +26,7 @@ fn main() {
     solve(Dec04 {}, "04");
     solve(Dec05 {}, "05");
     solve(Dec06 {}, "06");
+    solve(Dec07 {}, "07");
 }
 
 fn solve<T: Solution>(solution: T, prefix: &str) {
