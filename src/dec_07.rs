@@ -1,8 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    hash::Hash,
-    vec,
-};
+use std::{collections::HashMap, vec};
 
 use crate::common::Solution;
 
@@ -19,109 +15,45 @@ enum Command {
 #[derive(Debug)]
 enum Entry {
     Dir(String),
-    File(usize, String),
+    File(u32, String),
 }
 
 // ---------------------------------------------
 
-type DirIdex = usize;
-type FileIndex = usize;
-
 #[derive(Debug)]
 struct Tree {
     dirs: Vec<Dir>,
-    files: Vec<File>,
-    root: DirIdex,
-    children: HashMap<DirIdex, HashSet<ChildIndex>>,
-    children_by_name: HashMap<DirIdex, HashMap<String, ChildIndex>>,
+    children: HashMap<usize, HashMap<String, usize>>,
 }
 
 #[derive(Debug)]
 struct Dir {
-    index: DirIdex,
-    parent: Option<DirIdex>,
-    name: String,
-}
-
-#[derive(Debug)]
-struct File {
-    index: FileIndex,
-    parent: DirIdex,
-    name: String,
-    size: usize,
-}
-
-#[derive(Debug, PartialEq, Eq, Hash)]
-enum ChildIndex {
-    Dir(DirIdex),
-    File(FileIndex),
+    index: usize,
+    parent: Option<usize>,
+    size_of_contained_files: u32,
 }
 
 impl Tree {
-    fn get(&self, index: &ChildIndex) -> Option<&dyn Sizable> {
-        match index {
-            ChildIndex::Dir(dir_index) => self.get_dir(*dir_index).map(|x| x as &dyn Sizable),
-            ChildIndex::File(file_inxed) => self.get_file(*file_inxed).map(|x| x as &dyn Sizable),
-        }
-    }
-
-    fn get_dir(&self, index: DirIdex) -> Option<&Dir> {
-        if index >= self.dirs.len() {
-            return None;
-        }
-        Some(&self.dirs[index])
-    }
-
-    fn get_file(&self, index: FileIndex) -> Option<&File> {
-        if index >= self.files.len() {
-            return None;
-        }
-        Some(&self.files[index])
-    }
-
-    fn get_children_names(&self, index: DirIdex) -> HashSet<String> {
-        if let Some(children) = self.children.get(&index) {
-            return children
-                .iter()
-                .flat_map(|i| match i {
-                    ChildIndex::Dir(dir_index) => {
-                        self.get_dir(*dir_index).map(|dir| dir.name.clone())
-                    }
-                    ChildIndex::File(file_index) => {
-                        self.get_file(*file_index).map(|file| file.name.clone())
-                    }
-                })
-                .collect();
-        }
-        HashSet::new()
+    fn get(&self, index: usize) -> &Dir {
+        &self.dirs[index]
     }
 }
 
-trait Sizable {
-    fn get_size(&self, tree: &Tree) -> usize;
-}
-
-impl Sizable for File {
-    fn get_size(&self, _tree: &Tree) -> usize {
-        self.size
-    }
-}
-
-impl Sizable for Dir {
-    fn get_size(&self, tree: &Tree) -> usize {
-        let mut sum = 0;
-        for child_index in tree.children.get(&self.index).unwrap() {
-            sum += tree.get(child_index).unwrap().get_size(tree);
+impl Dir {
+    fn get_size(&self, tree: &Tree) -> u32 {
+        let mut sum = self.size_of_contained_files;
+        if let Some(children) = tree.children.get(&self.index) {
+            for (_, child_index) in children {
+                sum += tree.get(*child_index).get_size(tree);
+            }
         }
         sum
     }
 }
 
-impl Sizable for Tree {
-    fn get_size(&self, tree: &Tree) -> usize {
-        self.get(&ChildIndex::Dir(tree.root))
-            .unwrap()
-            .get_size(tree)
+impl Tree {
+    fn get_size(&self) -> u32 {
+        self.get(0).get_size(self)
     }
 }
 
@@ -152,7 +84,7 @@ fn get_tree(lines: &Vec<&str>) -> Tree {
                 Entry::Dir(line[4..].to_string())
             } else {
                 let mut parts = line.split(" ");
-                let size = parts.next().unwrap().parse::<usize>().unwrap();
+                let size = parts.next().unwrap().parse::<u32>().unwrap();
                 let file_name = parts.next().unwrap().to_string();
                 Entry::File(size, file_name)
             };
@@ -166,91 +98,52 @@ fn get_tree(lines: &Vec<&str>) -> Tree {
         }
     }
 
-    // println!("commands {:?}", commands);
-
     let mut tree = Tree {
         dirs: vec![Dir {
             index: 0,
             parent: None,
-            name: "/".to_string(),
+            size_of_contained_files: 0,
         }],
-        files: vec![],
-        root: 0,
         children: HashMap::new(),
-        children_by_name: HashMap::new(),
     };
 
-    let mut current_dir_index: DirIdex = 0;
+    let mut current: usize = 0;
 
     for command in commands {
-        let children_names = tree.get_children_names(current_dir_index);
         match command {
             Command::Ls(entries) => {
                 for entry in entries {
                     match entry {
                         Entry::Dir(dir_name) => {
-                            if !children_names.contains(&dir_name) {
-                                let index = tree.dirs.len();
-                                let dir = Dir {
-                                    index,
-                                    parent: Some(current_dir_index),
-                                    name: dir_name.clone(),
-                                };
-                                tree.dirs.push(dir);
+                            let index = tree.dirs.len();
+                            let dir = Dir {
+                                index,
+                                parent: Some(current),
+                                size_of_contained_files: 0,
+                            };
+                            tree.dirs.push(dir);
 
-                                tree.children
-                                    .entry(current_dir_index)
-                                    .or_insert_with(|| HashSet::new())
-                                    .insert(ChildIndex::Dir(index));
-                                tree.children_by_name
-                                    .entry(current_dir_index)
-                                    .or_insert_with(|| HashMap::new())
-                                    .insert(dir_name, ChildIndex::Dir(index));
-                            }
+                            tree.children
+                                .entry(current)
+                                .or_insert_with(|| HashMap::new())
+                                .insert(dir_name, index);
                         }
-                        Entry::File(size, file_name) => {
-                            if !children_names.contains(&file_name) {
-                                let index = tree.files.len();
-                                let file = File {
-                                    index,
-                                    parent: current_dir_index,
-                                    name: file_name.clone(),
-                                    size,
-                                };
-                                tree.files.push(file);
-
-                                tree.children
-                                    .entry(current_dir_index)
-                                    .or_insert_with(|| HashSet::new())
-                                    .insert(ChildIndex::File(index));
-                                tree.children_by_name
-                                    .entry(current_dir_index)
-                                    .or_insert_with(|| HashMap::new())
-                                    .insert(file_name, ChildIndex::File(index));
-                            }
+                        Entry::File(size, _) => {
+                            tree.dirs.get_mut(current).unwrap().size_of_contained_files += size;
                         }
                     }
                 }
             }
-            Command::CdRoot => current_dir_index = 0,
-            Command::CdOut => {
-                current_dir_index = tree.get_dir(current_dir_index).unwrap().parent.unwrap()
-            }
+            Command::CdRoot => current = 0,
+            Command::CdOut => current = tree.get(current).parent.unwrap(),
             Command::CdIn(name) => {
-                let child_index = tree
-                    .children_by_name
-                    .get(&current_dir_index)
-                    .unwrap()
-                    .get(&name)
-                    .unwrap();
+                let child_index = tree.children.get(&current).unwrap().get(&name).unwrap();
 
-                match child_index {
-                    ChildIndex::Dir(dir_index) => current_dir_index = *dir_index,
-                    ChildIndex::File(_) => panic!("can't cd into file"),
-                }
+                current = *child_index;
             }
         }
     }
+
     tree
 }
 
@@ -262,7 +155,7 @@ impl Solution for Dec07 {
             .iter()
             .map(|d| d.get_size(&tree))
             .filter(|s| *s <= 100000)
-            .sum::<usize>()
+            .sum::<u32>()
             .to_string()
     }
 
@@ -271,14 +164,9 @@ impl Solution for Dec07 {
         let meory_needed = 30000000;
 
         let tree = get_tree(lines);
-        let tree_size = tree.get_size(&tree);
-        let currently_free = total_memory - tree_size;
-        let additinally_needed = meory_needed - currently_free;
 
-        println!(
-            "tree_size {:?}, currently_free {:?}, additinally_needed {:?}",
-            tree_size, currently_free, additinally_needed
-        );
+        let currently_free = total_memory - tree.get_size();
+        let additinally_needed = meory_needed - currently_free;
 
         tree.dirs
             .iter()
